@@ -20,10 +20,15 @@ app.get("/", (req, res) => {
 });
 
 app.post("/urls", async (req, res) => {
-  const { url } = req.body;
+ const { url } = req.body;
 
-  const shortCode = Math.random().toString(36).substring(2, 8);
+if (typeof url !== "string" || !URL.canParse(url)) {
+  return res.status(400).json({
+    message: "URL inválida",
+  });
+}
 
+const shortCode = Math.random().toString(36).substring(2, 8);
   const createdUrl = await prisma.url.create({
     data: {
       originalUrl: url,
