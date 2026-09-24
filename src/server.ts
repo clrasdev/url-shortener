@@ -19,6 +19,10 @@ app.get("/", (req, res) => {
   });
 });
 
+function generateShortCode(): string {
+  return Math.random().toString(36).substring(2, 8);
+}
+
 app.post("/urls", async (req, res) => {
  const { url } = req.body;
 
@@ -28,13 +32,30 @@ if (typeof url !== "string" || !URL.canParse(url)) {
   });
 }
 
-const shortCode = Math.random().toString(36).substring(2, 8);
-  const createdUrl = await prisma.url.create({
-    data: {
-      originalUrl: url,
+let shortCode = generateShortCode();
+
+let existingUrl = await prisma.url.findUnique({
+  where: {
+    shortCode,
+  },
+});
+
+while (existingUrl) {
+  shortCode = generateShortCode();
+
+  existingUrl = await prisma.url.findUnique({
+    where: {
       shortCode,
     },
   });
+}
+
+const createdUrl = await prisma.url.create({
+  data: {
+    originalUrl: url,
+    shortCode,
+  },
+});
 
   res.status(201).json(createdUrl);
 });
