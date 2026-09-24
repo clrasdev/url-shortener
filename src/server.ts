@@ -6,7 +6,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({
-    message: "URL Shortener API",
+    message: "URL Shortener API funcionado!",
   });
 });
 
